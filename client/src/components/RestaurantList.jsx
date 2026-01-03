@@ -1,0 +1,111 @@
+import React, {useContext, useEffect} from 'react'
+import RestaurantFinder from '../apis/RestaurantFinder'
+import { RestaurantContext } from '../Context/RestaurantContext'
+import {useNavigate} from "react-router-dom";
+import StarRating from './StarRating';
+
+
+export const RestaurantList = (props) => {
+
+    const {restaurant, setRestaurant}=useContext(RestaurantContext)
+    let navigate=useNavigate()
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await RestaurantFinder.get("/");
+
+            setRestaurant(response.data.data.restaurant)
+          } catch (err) {
+            console.error(err);
+          }
+        };
+    
+        fetchData();
+      }, []);
+
+      const handleDelete=async (e,id)=>{
+        e.stopPropagation()
+        try{
+           const response=await RestaurantFinder.delete(`/${id}`);
+           setRestaurant(restaurant.filter(restaurant=>{
+            return restaurant.id!==id
+           }))
+        }catch(err){}
+      };
+
+      const handleUpdate=(e, id)=>{
+        e.stopPropagation()
+        navigate(`/restaurant/${id}/update`);
+      };
+
+      const handleRestaurantSelect=(id)=>{
+        navigate(`/restaurant/${id}`)
+      }
+
+      const renderRating=(restaurant)=>{
+        if(!restaurant.count){
+            return <span className="text-warning">0 reviews</span>
+        }
+        return<><StarRating rating={restaurant.id}/>
+        <span className="text-warning ml-1">({restaurant.count})</span>
+        </>
+      }
+
+
+
+
+  return (
+    <div className='list-group'>
+        <table className='table table-hover table-dark'>
+            <thead>
+                <tr className="bg-primary">
+                <th scope="col" style={{ backgroundColor: 'blue' }}>Restaurant</th>
+
+                    <th scope="col" style={{ backgroundColor: 'blue' }}>Location</th>
+                    <th scope="col" style={{ backgroundColor: 'blue' }}>Price range</th>
+                    <th scope="col" style={{ backgroundColor: 'blue' }}>Ratings</th>
+                    <th scope="col" style={{ backgroundColor: 'blue' }}>Edit</th>
+                    <th scope="col" style={{ backgroundColor: 'blue' }}>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {restaurant && restaurant.map(restaurant=>{
+                    return (
+                    <tr onClick={()=>handleRestaurantSelect(restaurant.id)} key={restaurant.id}>
+                        <td>{restaurant.name}</td>
+                        <td>{restaurant.location}</td>
+                        <td>{"$".repeat(restaurant.price_range)}</td>
+                        <td>{renderRating(restaurant)}</td>
+                        <td>
+                            <button onClick={(e)=>handleUpdate(e, restaurant.id)} className='btn btn-warning'>Update</button>
+                        </td>
+                        <td>
+                            <button onClick={(e)=>handleDelete(e, restaurant.id)} className='btn btn-danger'>Delete</button>
+                        </td>
+                    </tr>
+                    );
+                })}
+                {/* <tr>
+                    <td>mcdonalds</td>
+                    <td>London</td>
+                    <td>$$</td>
+                    <td>Rating</td>
+                    <td><button className='btn btn-warning'>Update</button></td>
+                    <td><button className='btn btn-danger'>Delete</button></td>
+                </tr>
+
+                <tr>
+                    <td>mcdonalds</td>
+                    <td>London</td>
+                    <td>$$</td>
+                    <td>Rating</td>
+                    <td><button className='btn btn-warning'>Update</button></td>
+                    <td><button className='btn btn-danger'>Delete</button></td>
+                </tr> */}
+            </tbody>
+        </table>
+
+    </div>
+  )
+}
