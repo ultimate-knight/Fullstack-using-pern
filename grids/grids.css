@@ -1,0 +1,21 @@
+.container{
+    border: 3px solid rgb(89,78,230);
+    display: grid;
+    grid-template-columns: 200px 100px;
+    grid-template-rows: 100px 100px 100px;
+    grid-row-start: 1;
+    grid-row-end:3;
+}
+
+.con{
+    border: 2px solid blueviolet;
+    height: 100px;
+    width: 100px;
+    background-color: aquamarine;
+}
+
+.con:hover{
+    transform: rotate(45deg);
+    background-color: blue;
+    border-radius: 50%;
+}
